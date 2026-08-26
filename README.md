@@ -27,7 +27,7 @@
 ### Windows（PowerShell）
 ```powershell
 # 克隆后
-git clone <你的仓库地址> fluent-cfd-deploy
+git clone https://github.com/qing9835/dsh-agent-pyfluent.git fluent-cfd-deploy
 cd fluent-cfd-deploy
 .\install.ps1
 ```
@@ -35,7 +35,7 @@ cd fluent-cfd-deploy
 
 ### Linux / macOS（bash）
 ```bash
-git clone <你的仓库地址> fluent-cfd-deploy
+git clone https://github.com/qing9835/dsh-agent-pyfluent.git fluent-cfd-deploy
 cd fluent-cfd-deploy
 ./install.sh
 ```
