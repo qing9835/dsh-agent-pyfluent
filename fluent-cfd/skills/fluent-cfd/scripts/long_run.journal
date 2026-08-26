@@ -1,0 +1,26 @@
+; long_run.journal - autonomous long Fluent run via a plain GUI Fluent process.
+; IMMUNE to the MCP run_code tool-call timeout: the iteration runs inside this
+; Fluent process (launched with `fluent.exe -i long_run.journal`), not inside a
+; run_code call, so no client timeout can interrupt or kill it.
+;
+; Launch (GUI visible, 2D double, 16 cores):
+;   fluent.exe 2ddp -t16 -i "<abs path>\long_run.journal"
+;
+; Environment variables (read at runtime, so the journal is reusable):
+;   FLUENT_CASE_DIR  base dir with the case   (default ".")
+;   FLUENT_CASE      base .cas.h5 name       (default tc-39-F002-scaled.cas.h5)
+;   FLUENT_SNAP_DIR  snapshot dir (under CASE_DIR) (default snaps)
+;   FLUENT_OUT       final case+data name    (default tc-39-F002-final.cas.h5)
+;   FLUENT_BLOCKS    number of 500-step blocks (default 60)
+;   FLUENT_ITERS     iterations per block    (default 500)
+(let* ((cdir (or (getenv "FLUENT_CASE_DIR") "."))
+       (case (string-append cdir "/" (or (getenv "FLUENT_CASE") "tc-39-F002-scaled.cas.h5")))
+       (snapdir (string-append cdir "/" (or (getenv "FLUENT_SNAP_DIR") "snaps")))
+       (out (string-append cdir "/" (or (getenv "FLUENT_OUT") "tc-39-F002-final.cas.h5")))
+       (blocks (string->number (or (getenv "FLUENT_BLOCKS") "60")))
+       (iters (string->number (or (getenv "FLUENT_ITERS") "500"))))
+  (ti-menu-load-string (string-append "/file/read-case-data \"" case "\""))
+  (do ((i 1 (+ i 1))) ((> i blocks))
+    (ti-menu-load-string (string-append "/solve/iterate " (number->string iters)))
+    (ti-menu-load-string (string-append "/file/write-data \"" snapdir "/tc39_" (number->string (* i iters)) ".dat.h5\"")))
+  (ti-menu-load-string (string-append "/file/write-case-data \"" out "\"")))

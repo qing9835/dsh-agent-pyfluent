@@ -1,0 +1,2 @@
+name: Fluent CFD
+description: 面向 ANSYS Fluent / PyFluent 的 CFD 智能体。通过本机 ansys-fluent-mcp 驱动 Fluent，并以内置的 Fluent CFD skill 作为判断层。
