@@ -36,6 +36,11 @@ python -m pip install "ansys-fluent-core==0.41.0" "ansys-fluent-mcp==0.4.0"
 - `ansys-fluent-mcp`：提供 `ansys-fluent-mcp` 命令（Windows 下为 `Scripts\ansys-fluent-mcp.exe`）。
 - 安装后确认：`python -c "import ansys.fluent.core as f; print(f.__version__)"` 和 `ansys-fluent-mcp --help`。
 
+### 相关官方来源（upstream）
+
+- **PyFluent（`ansys-fluent-core`）**：<https://github.com/ansys/pyfluent>
+- **PyFluent MCP server（`ansys-fluent-mcp`）**：<https://github.com/ansys/pyfluent-mcp>
+
 ---
 
 ## 2. 一键安装
