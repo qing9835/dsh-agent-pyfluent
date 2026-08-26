@@ -28,7 +28,7 @@ There is **no** `launch_fluent` / `read_case` / `run_tui` / `iterate` / `write_c
 ## Safe call order
 
 1. `session_status`; tell the user if Fluent will launch / consume a license.
-2. `connect` (launch or attach).
+2. `connect` — **ATTACH ONLY**: pass `ip`/`port`/`password` (from `session_info.json`). Do NOT call `connect` to LAUNCH a new Fluent session (no ip/port spawns a session tied to the `run_code` lifecycle); use `scripts/fluent_host.py` to launch+hold, then attach. See `host-attach-run.md`.
 3. `run_code("solver.settings.file.read_case_data(file_name=r'<path>')")` loads case+data in one shot (`read_case` = case only; `file.read_data` = data only).
 4. Discover with `get_state` / `list_named_objects` / `find_api` / `get_help`.
 5. `run_code("solver.solution.run_calculation.iterate(iter_count=N)")` — SHORT smoke run only.

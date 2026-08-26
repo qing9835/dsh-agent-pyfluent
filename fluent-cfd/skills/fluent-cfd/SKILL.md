@@ -28,8 +28,10 @@ Use this skill as the workflow and judgment layer for Ansys Fluent work. Keep Fl
 
 ## Execution loop (through `mcp__fluent__*`)
 
+0. **Pick the path — SHORT vs LONG.** For a long/serious run, go host + MCP-attach FIRST (`references/host-attach-run.md`): start `scripts/fluent_host.py` (background job) → wait for `session_info.json` → `connect(ip, port, password)` to ATTACH → interactive setup → write `go.json` → host iterates, you monitor `run_status.json` / write `control.json`. The classic path below is only for a short smoke/one-off.
+
 1. `session_status` — say so if Fluent will launch / consume a license.
-2. `connect` (launch/attach). If the case is 2D, connect with `dimension: 2`.
+2. `connect` — **ATTACH ONLY**: use the ip/port/password from `session_info.json`. NEVER call `connect` without ip/port (that LAUNCHES a new session tied to the `run_code` lifecycle; avoid). To launch, use `scripts/fluent_host.py`, not `connect`.
 3. `run_code("solver.settings.file.read_case_data(file_name=r'<path>')")` loads case+data.
 4. Discover with `get_state` / `list_named_objects` / `find_api` / `get_help`.
 5. `run_code` a SHORT smoke `iterate`; verify with `solver_status` / `simulation_report`.

@@ -30,6 +30,7 @@
       - Do not skip mesh quality, units, boundary-zone naming, boundary-condition consistency, or wall-resolution checks.
       - Do not change turbulence models without a physical reason or a stated validation purpose.
       - Before starting Fluent or consuming a license, state that the action will launch Fluent and may occupy a license/session; end live sessions with `disconnect` when done (keep a GUI run open only via `solver_loop.py --keep-open`).
+      - **NEVER call `connect` to LAUNCH Fluent.** `connect` with no ip/port spawns a NEW session that is tied to the `run_code` lifecycle and dies on timeout. For ANY real run, START `scripts/fluent_host.py` (as a background job) FIRST — it launches + holds the session and writes `session_info.json`; THEN call `connect(ip, port, password)` to ATTACH to it. `run_code` is for short setup/monitor only, never long iteration.
       - Show the user the generated PyFluent code before `run_code`, and run `validate_code` first for safety-critical operations. The server rejects `.tui.*` calls — use `solver.settings.*`.
       - If a tool returns an error, STOP the sequence, summarize the failure, and propose the smallest safe recovery. Do not retry the same snippet blindly.
 

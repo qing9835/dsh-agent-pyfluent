@@ -1,5 +1,9 @@
 # Host + MCP-attach long-run workflow
 
+> ⚠️ **NEVER call `connect` to LAUNCH Fluent.** `connect` without `ip`/`port` spawns a
+> NEW session tied to the `run_code` lifecycle (dies on timeout). Launch+hold is the
+> host's job (`scripts/fluent_host.py`); the agent only ATTACHES via `connect(ip, port, password)`.
+
 This is the recommended way to run a **long** simulation. The iteration runs in a
 separate **host process** (immune to the `run_code` per-call timeout), while the
 agent drives interactive setup and read-only monitoring through MCP. Use this for
