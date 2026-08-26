@@ -15,10 +15,10 @@
 | 项 | 说明 |
 |---|---|
 | DSH（`.dsh`） | 已安装并可用（`~/.dsh/`，含 `agent-presets` 目录） |
-| ANSYS Fluent | 建议 **2025 R2 / v25.2**（`agent.cordis.yml` 里 AWP root 指向它）+ 有效 **license** |
+| ANSYS Fluent | 支持 **2024 R2（v241）及之后所有版本**（24R2/25R1/25R2 等；安装脚本按探测到的版本注入对应 `AWP_ROOT<版本>`）+ 有效 **license** |
 | Python 3.x | 装 `ansys-fluent-core`（PyFluent）+ `ansys-fluent-mcp`（用到 `ansys-fluent-mcp` 命令/`ansys-fluent-mcp.exe`） |
 
-> 版本不匹配是常见坑：`pyfluent` 与 Fluent 发行版要对应（PyFluent 0.41 ↔ Fluent 25.2）。
+> 版本不匹配是常见坑：`pyfluent` 与 Fluent 发行版要对应（PyFluent 0.41 ↔ Fluent 25.2；较新 Fluent 需匹配的 pyfluent-core）。`solver_loop.py` 默认自动探测本机 Fluent 版本。
 
 ---
 
@@ -46,8 +46,7 @@ cd fluent-cfd-deploy
    ```yaml
    command: '<python的Scripts目录>\ansys-fluent-mcp.exe'   # 你本机的 mcp 可执行文件
    env:
-     AWP_ROOT252: '<你的Ansys安装目录，如 D:\Program Files\ANSYS Inc\v252>'
-     AWP_ROOT25:  '<同上>'
+     AWP_ROOT<版本>: '<你的Ansys安装目录，如 D:\Program Files\ANSYS Inc\v252>'   # v241/v252 等
    ```
 
 ### 覆盖自动检测
@@ -77,7 +76,7 @@ cd fluent-cfd-deploy
 ## 4. 故障排查
 
 - **`File has wrong dimensions (2)`**：case 是 2D，但会话是 3D。启动时用 `dimension=2`（`solver_loop.py` 已内置；MCP `connect` 用 `connect_kwargs={"dimension":2,...}`）。
-- **PyFluent 找不到 Fluent**：`AWP_ROOT252`/`AWP_ROOT25` 没指向你的 v252。
+- **PyFluent 找不到 Fluent**：`AWP_ROOT<版本>` 没指向你的实际安装目录（`solver_loop.py` 用 `--version` 或自动探测；MCP 由安装脚本注入正确的 AWP_ROOT 变量）。
 - **`ansys-fluent-mcp` 命令不存在**：装 `ansys-fluent-mcp` 包，或把 `command` 指向实际路径。
 - **license**：确认 license 服务已启动、可用。
 - **长跑被断**：走了 `run_code` 长迭代 → 改用 `solver_loop.py` / `long_run.journal`（后台进程，无超时）。

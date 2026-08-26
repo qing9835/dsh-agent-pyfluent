@@ -78,17 +78,20 @@ cp -R "$SRC" "$TARGET"
 echo "copied preset -> $TARGET"
 
 YML="$TARGET/agent.cordis.yml"
-envsubst 2>/dev/null || true
-python3 - "$YML" "$MCP" "$ANYSYS" <<'PY' || true
+# derive AWP_ROOT<version> var name from the ansys dir (v252 -> AWP_ROOT252)
+AWPVAR="__AWP_ROOT_VARNAME__"
+if [[ "$ANYSYS" =~ v([0-9]+)[^/]*$ ]]; then AWPVAR="AWP_ROOT${BASH_REMATCH[1]}"; fi
+echo "awp var: $AWPVAR"
+python3 - "$YML" "$MCP" "$ANYSYS" "$AWPVAR" <<'PY' || true
 import io,sys
-path,mcp,ansys=sys.argv[1],sys.argv[2],sys.argv[3]
+path,mcp,ansys,awpvar=sys.argv[1],sys.argv[2],sys.argv[3],sys.argv[4]
 s=io.open(path,encoding="utf-8").read()
-s=s.replace("__PYTHON_ANSYS_FLUENT_MCP__",mcp).replace("__ANSYS_AWP_ROOT__",ansys)
+s=s.replace("__PYTHON_ANSYS_FLUENT_MCP__",mcp).replace("__AWP_ROOT_VARNAME__",awpvar).replace("__ANSYS_AWP_ROOT__",ansys)
 io.open(path,"w",encoding="utf-8").write(s)
 PY
 echo "filled machine paths in agent.cordis.yml"
 
-if grep -q '__PYTHON_ANSYS_FLUENT_MCP__\|__ANSYS_AWP_ROOT__' "$YML"; then
+if grep -q '__PYTHON_ANSYS_FLUENT_MCP__\|__ANSYS_AWP_ROOT__\|__AWP_ROOT_VARNAME__' "$YML"; then
   echo "WARN: unresolved tokens remain. Edit agent.cordis.yml manually."
 else
   echo "RESOLVED: no unresolved tokens."

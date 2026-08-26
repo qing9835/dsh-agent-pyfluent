@@ -74,17 +74,27 @@ New-Item -ItemType Directory -Path (Split-Path $Target) -Force | Out-Null
 Copy-Item -Path $Src -Destination $Target -Recurse -Force
 Write-Host "copied preset -> $Target"
 
-# --- substitute the two templates ---
+# --- derive the AWP_ROOT<version> env var name from the ansys dir (v241 -> AWP_ROOT241) ---
+$awpVar = '__AWP_ROOT_VARNAME__'
+if ($AnsysRoot -match 'v(\d+)\s*$') { $awpVar = "AWP_ROOT$($Matches[1])" }
+elseif ($AnsysRoot -notmatch '__') {
+  $leaf = Split-Path $AnsysRoot -Leaf
+  if ($leaf -match 'v(\d+)') { $awpVar = "AWP_ROOT$($Matches[1])" }
+}
+Write-Host "awp var: $awpVar"
+
+# --- substitute the three templates ---
 $yml = Join-Path $Target 'agent.cordis.yml'
 $content = Get-Content $yml -Raw
 $content = $content -replace '__PYTHON_ANSYS_FLUENT_MCP__', $mcpExe
+$content = $content -replace '__AWP_ROOT_VARNAME__', $awpVar
 $content = $content -replace '__ANSYS_AWP_ROOT__', $AnsysRoot
 Set-Content -Path $yml -Value $content -NoNewline -Encoding UTF8
 Write-Host "filled machine paths in agent.cordis.yml"
 
 # --- verify ---
 $check = Get-Content $yml -Raw
-if ($check -match '__PYTHON_ANSYS_FLUENT_MCP__' -or $check -match '__ANSYS_AWP_ROOT__') {
+if ($check -match '__PYTHON_ANSYS_FLUENT_MCP__' -or $check -match '__ANSYS_AWP_ROOT__' -or $check -match '__AWP_ROOT_VARNAME__') {
   Write-Warning "One or more tokens could not be resolved. Edit agent.cordis.yml manually."
 } else {
   Write-Host "RESOLVED: no unresolved tokens." -ForegroundColor Green

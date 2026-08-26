@@ -19,7 +19,9 @@ writes the stack trace into the report and exits non-zero.  The agent monitors
 via the report file and intervenes.
 
 LAUNCH ARGS (verified via dry-run so the *2D* case loads correctly):
-  * product_version="25.2.0"           (NOT the deprecated `version` kwarg!)
+  * product_version optional (omit => PyFluent auto-detects the installed version;
+    supports 24R2/v241 and later). Use it ONLY if you need a specific release, e.g.
+    24.2.0 / 25.2.0. NOTE: never the deprecated `version` kwarg!
   * dimension=2                        -> generates the "2ddp" launch string
   * ui_mode="gui"  (default)           -> visible GUI; --no-gui -> headless (-hidden)
 
@@ -47,7 +49,8 @@ def main():
     p.add_argument("--blocks", type=int, default=60)
     p.add_argument("--iters-per-block", type=int, default=500)
     p.add_argument("--proc", type=int, default=16)
-    p.add_argument("--version", default="25.2.0")
+    p.add_argument("--version", default=None,
+                   help="Fluent product version, e.g. 24.2.0 / 25.2.0 (default: auto-detect the installed version)")
     p.add_argument("--no-gui", action="store_true", help="headless (no window); default is GUI visible")
     p.add_argument("--keep-open", action="store_true",
                    help="do NOT exit the Fluent session / close the GUI when the run finishes; "
@@ -65,7 +68,7 @@ def main():
 
     rec = {
         "state": "starting", "case": case, "blocks": a.blocks, "iters_per_block": a.iters_per_block,
-        "proc": a.proc, "dim": 2, "version": a.version,
+        "proc": a.proc, "dim": 2, "version": a.version or "auto",
         "ui_mode": "headless(-hidden)" if a.no_gui else "gui", "keep_open": a.keep_open,
         "start": time.strftime("%Y-%m-%d %H:%M:%S"),
         "blocks_done": 0, "total_iters": 0, "residual": None, "error": None,
@@ -86,9 +89,10 @@ def main():
         # Headless: OMIT ui_mode -> Fluent launches with -hidden (VERIFIED to reach
         # read_case_data).  Do NOT use ui_mode='no_gui' -> "-gu -driver null" hangs.
         dprint("launching pyfluent version=%s dim=2 proc=%s ui=%s ..."
-               % (a.version, a.proc, "headless(-hidden)" if a.no_gui else "gui"))
-        launch_kwargs = dict(product_version=a.version, dimension=2, processor_count=a.proc,
-                             cleanup_on_exit=(not a.keep_open))
+               % (a.version or "auto", a.proc, "headless(-hidden)" if a.no_gui else "gui"))
+        launch_kwargs = dict(dimension=2, processor_count=a.proc, cleanup_on_exit=(not a.keep_open))
+        if a.version:
+            launch_kwargs["product_version"] = a.version     # omit => PyFluent auto-detects installed Fluent
         if not a.no_gui:
             launch_kwargs["ui_mode"] = "gui"
         solver = pyfluent.launch_fluent(**launch_kwargs)

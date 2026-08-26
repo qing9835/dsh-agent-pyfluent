@@ -103,8 +103,10 @@
     # the agent has to fall back to a `fluent_path` workaround. `dsh-mcp-client`
     # merges this `env` onto scrubbed ambient env at spawn (transport.ts).
     env:
-      AWP_ROOT252: '__ANSYS_AWP_ROOT__'
-      AWP_ROOT25:  '__ANSYS_AWP_ROOT__'
+      # install.ps1 / install.sh replace __AWP_ROOT_VARNAME__ with the version-specific
+      # var (e.g. AWP_ROOT241 for 24R2, AWP_ROOT252 for 25.2) and __ANSYS_AWP_ROOT__ with
+      # the detected ANSYS install dir. Supports 24R2 and later.
+      __AWP_ROOT_VARNAME__: '__ANSYS_AWP_ROOT__'
 
 # ── goals ───────────────────────────────────────────────────────────────────
 
