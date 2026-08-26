@@ -115,4 +115,4 @@ if ($check -match '__PYTHON_ANSYS_FLUENT_MCP__' -or $check -match '__ANSYS_AWP_R
 }
 
 Write-Host ""
-Write-Host "Done. Start a DSH agent from the 'fluent-cfd' preset. Prereqs: ANSYS Fluent v25.2 + license, pyfluent-core, ansys-fluent-mcp." -ForegroundColor Cyan
+Write-Host ("Done. Start a DSH agent from the 'fluent-cfd' preset. Prereqs: ANSYS Fluent 24R2+ (detected: {0}) + license, pyfluent-core, ansys-fluent-mcp." -f $AnsysRoot) -ForegroundColor Cyan

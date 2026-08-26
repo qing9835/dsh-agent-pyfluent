@@ -97,4 +97,4 @@ else
   echo "RESOLVED: no unresolved tokens."
 fi
 
-echo "Done. Start a DSH agent from the 'fluent-cfd' preset. Prereqs: ANSYS Fluent v25.2 + license, pyfluent-core, ansys-fluent-mcp."
+echo "Done. Start a DSH agent from the 'fluent-cfd' preset. Prereqs: ANSYS Fluent 24R2+ (detected: $ANYSYS) + license, pyfluent-core, ansys-fluent-mcp."
