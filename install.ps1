@@ -51,11 +51,25 @@ if (-not $mcpExe) {
 # --- locate ANSYS AWP root ---
 if (-not $AnsysRoot) { $AnsysRoot = $env:ANSYS_AWP_ROOT }
 if (-not $AnsysRoot) {
-  $base = if ($env:ProgramFiles) { "$env:ProgramFiles\ANSYS Inc" } else { 'C:\Program Files\ANSYS Inc' }
-  $found = Get-ChildItem $base -Directory -ErrorAction SilentlyContinue |
-    Where-Object { $_.Name -match '^v(\d+)$' } |
-    Sort-Object { [int]($_.Name.Substring(1)) } -Descending | Select-Object -First 1
-  if ($found) { $AnsysRoot = $found.FullName }
+  # Scan ALL fixed drives for `...\Program Files\ANSYS Inc\v#{n}` / `...\ANSYS Inc\v#{n}`,
+  # take the HIGHEST version (supports ANSYS on any drive, e.g. D:\, and 24R2+).
+  $bases = @()
+  foreach ($drv in (Get-PSDrive -PSProvider FileSystem -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Root)) {
+    $bases += (Join-Path $drv 'Program Files\ANSYS Inc')
+    $bases += (Join-Path $drv 'ANSYS Inc')
+  }
+  $best = $null; $bestV = -1
+  foreach ($b in ($bases | Select-Object -Unique)) {
+    if (Test-Path $b) {
+      foreach ($v in (Get-ChildItem $b -Directory -Filter 'v*' -ErrorAction SilentlyContinue)) {
+        if ($v.Name -match '^v(\d+)$') {
+          $vn = [int]$Matches[1]
+          if ($vn -gt $bestV) { $bestV = $vn; $best = $v.FullName }
+        }
+      }
+    }
+  }
+  if ($best) { $AnsysRoot = $best }
 }
 if (-not $AnsysRoot) {
   Write-Warning "ANSYS install not detected. Set env ANSYS_AWP_ROOT (e.g. C:\Program Files\ANSYS Inc\v252)."
