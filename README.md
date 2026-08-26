@@ -16,9 +16,25 @@
 |---|---|
 | DSH（`.dsh`） | 已安装并可用（`~/.dsh/`，含 `agent-presets` 目录） |
 | ANSYS Fluent | 支持 **2024 R2（v241）及之后所有版本**（24R2/25R1/25R2 等；安装脚本按探测到的版本注入对应 `AWP_ROOT<版本>`）+ 有效 **license** |
-| Python 3.x | 装 `ansys-fluent-core`（PyFluent）+ `ansys-fluent-mcp`（用到 `ansys-fluent-mcp` 命令/`ansys-fluent-mcp.exe`） |
+| Python 3.x | 装下述包（见「依赖安装命令」） |
 
 > 版本不匹配是常见坑：`pyfluent` 与 Fluent 发行版要对应（PyFluent 0.41 ↔ Fluent 25.2；较新 Fluent 需匹配的 pyfluent-core）。`solver_loop.py` 默认自动探测本机 Fluent 版本。
+
+### 依赖安装命令
+
+```bash
+python -m pip install ansys-fluent-core ansys-fluent-mcp
+```
+
+建议按版本锁定，确保与你的 Fluent 发行版匹配（本仓库验证用 `ansys-fluent-core==0.41.0`、`ansys-fluent-mcp==0.4.0`）：
+
+```bash
+python -m pip install "ansys-fluent-core==0.41.0" "ansys-fluent-mcp==0.4.0"
+```
+
+- `ansys-fluent-core`（PyFluent）：`solver_loop.py` 里 `import ansys.fluent.core` 所用的包。
+- `ansys-fluent-mcp`：提供 `ansys-fluent-mcp` 命令（Windows 下为 `Scripts\ansys-fluent-mcp.exe`）。
+- 安装后确认：`python -c "import ansys.fluent.core as f; print(f.__version__)"` 和 `ansys-fluent-mcp --help`。
 
 ---
 
