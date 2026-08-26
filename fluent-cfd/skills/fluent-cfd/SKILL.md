@@ -33,7 +33,7 @@ Use this skill as the workflow and judgment layer for Ansys Fluent work. Keep Fl
 3. `run_code("solver.settings.file.read_case_data(file_name=r'<path>')")` loads case+data.
 4. Discover with `get_state` / `list_named_objects` / `find_api` / `get_help`.
 5. `run_code` a SHORT smoke `iterate`; verify with `solver_status` / `simulation_report`.
-6. Continue only when stable. **Anything longer than a smoke run must go through `scripts/solver_loop.py` or `long_run.journal`** (a per-call timeout kills a `run_code`-driven long iteration and its session) — see `pyfluent-execution.md` § Long-run.
+6. Continue only when stable. **Anything longer than a smoke run must go through the host + MCP-attach workflow** (`scripts/fluent_host.py`), or `solver_loop.py` / `long_run.journal` as fallbacks — a per-call timeout kills a `run_code`-driven long iteration and its session. See `references/host-attach-run.md`.
 7. `run_code` `write_case`/`write_data` to preserve state; `disconnect` when done.
 
 Golden rules (details in `pyfluent-execution.md`): `get_state`/`find_api` take a STRING, not a list; named expressions need units (`'288.15 [K]'`); discretization schemes are a named collection (`ds["k"]=...`); never retry a `risk_blocked` snippet; on any tool error STOP and propose the smallest safe recovery.
@@ -45,7 +45,8 @@ Load only what the task needs:
 - `references/workflow.md` — end-to-end order + solver/model selection.
 - `references/boundaries-and-turbulence.md` — boundary types + turbulence/wall treatment / y+.
 - `references/numerics-and-convergence.md` — numerics, initialization, monitors, convergence (incl. reacting/shock-flow judgment).
-- `references/pyfluent-execution.md` — the `ansys-fluent-mcp` tool surface, safe call order, all verified pitfalls (launch/dimension, field data, console capture, sandbox limits, reacting gotchas), and long-run execution (`solver_loop.py` / `long_run.journal`, `--keep-open`). **Read this before real execution.**
+- `references/pyfluent-execution.md` — the `ansys-fluent-mcp` tool surface, safe call order, all verified pitfalls (launch/dimension, field data, console capture, sandbox limits, reacting gotchas), and long-run execution. **Read this before real execution.**
+- `references/host-attach-run.md` — the recommended **long-run workflow**: `scripts/fluent_host.py` launches + holds a session, the agent attaches via MCP (`connect ip/port/password` from `session_info.json`) for interactive setup, then drives iteration block-by-block with `go.json`/`run_status.json`/`control.json` and read-only monitoring.
 - `references/preprocessing-calculations.md` — porous-medium resistance (Ergun/Forchheimer, corrected C2), isentropic flow, y+/boundary-layer first-cell height, validated gas properties. Run `scripts/preprocessing.py` before setting BCs / porous zones / BL mesh.
 - `references/validation-and-recovery.md` — conservation, mesh independence, plausibility, acceptance statements, and launch/divergence/CFL/negative-volume recovery.
 

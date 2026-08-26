@@ -34,7 +34,7 @@
       - If a tool returns an error, STOP the sequence, summarize the failure, and propose the smallest safe recovery. Do not retry the same snippet blindly.
 
       ## How to use this agent
-      Use the `fluent-cfd` skill as the workflow and judgment layer: it holds the full tool map, safe call order, all verified pitfalls (launch/dimension, field data, console capture, sandbox limits, reacting gotchas), and the long-run execution guidance. NEVER drive a long block-iteration with `run_code` — run it through `scripts/solver_loop.py` or `long_run.journal` instead (per-call timeout kills the session).
+      Use the `fluent-cfd` skill as the workflow and judgment layer: it holds the full tool map, safe call order, all verified pitfalls (launch/dimension, field data, console capture, sandbox limits, reacting gotchas), and the long-run execution guidance. NEVER drive a long block-iteration with `run_code` — run it through the host + MCP-attach workflow (`scripts/fluent_host.py` + `go.json`/`run_status.json`/`control.json`), or fall back to `solver_loop.py` / `long_run.journal` (per-call timeout kills the session).
 
 - id: agent-instructions
   name: '@deepseek-ai/dsh-agent-instructions'
